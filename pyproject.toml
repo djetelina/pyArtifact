@@ -1,14 +1,19 @@
 [tool.poetry]
 name = "pyArtifact"
 version = "0.1.0"
+license = "MIT"
 description = "Pythonic wrapper around Valve's Artifact API"
 authors = ["David Jetelina <david@djetelina.cz>"]
+repository = "https://github.com/iscre4m/pyartifact"
+homepage = "https://github.com/iscre4m/pyartifact"
+readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "*"
+python = "^3.6"
 requests = "^2.20"
 mypy_extensions = "^0.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
 mypy = "^0.641.0"
+flake8 = "^3.6"

@@ -25,7 +25,7 @@ class Cards:
         if localize is not None:
             ctx.language = localize
 
-    def load_all_sets(self):
+    def load_all_sets(self) -> None:
         ctx.cards_by_id = {}
         ctx.cards_by_name = {}
         for set in self.sets:
