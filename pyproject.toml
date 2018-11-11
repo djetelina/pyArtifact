@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "pyArtifact"
+version = "0.1.0"
+description = "Pythonic wrapper around Valve's Artifact API"
+authors = ["David Jetelina <david@djetelina.cz>"]
+
+[tool.poetry.dependencies]
+python = "*"
+requests = "^2.20"
+mypy_extensions = "^0.4.1"
+
+[tool.poetry.dev-dependencies]
+pytest = "^3.0"
+mypy = "^0.641.0"
