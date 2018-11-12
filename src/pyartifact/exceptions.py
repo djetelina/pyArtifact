@@ -8,3 +8,11 @@ class FilterException(PyArtifactException):
 
 class UnknownFilterArgument(FilterException):
     pass
+
+
+class InvalidDeck(PyArtifactException):
+    pass
+
+
+class InvalidDeckString(InvalidDeck):
+    pass
