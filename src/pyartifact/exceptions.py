@@ -16,3 +16,7 @@ class InvalidDeck(PyArtifactException):
 
 class InvalidDeckString(InvalidDeck):
     pass
+
+
+class DeckDecodeException(PyArtifactException):
+    pass

@@ -1,4 +1,4 @@
-from pyartifact.deck import Deck
+from pyartifact import Deck, decode_deck_string
 
 
 def test_filtering(cards):
@@ -13,6 +13,11 @@ def test_passive_ability(cards):
     assert cards.get('STORM SPIRIT').passive_abilities[0].name == 'Overload'
 
 
-def test_deck(cards):
-    deck = Deck.decode('ADCJWkTZX05uwGDCRV4XQGy3QGLmqUBg4GQJgGLGgO7AaABR3JlZW4vQmxhY2sgRXhhbXBsZQ__')
-    assert deck.name == 'Green/Black Example'
+def test_decode_deck_deck_string(deck_code):
+    name, heroes, cards = decode_deck_string(deck_code['string'])
+    print(cards)
+
+
+def test_deck_from_code(cards, deck_code):
+    deck = Deck.from_code(deck_code['string'])
+    assert deck.name == deck_code['name']
