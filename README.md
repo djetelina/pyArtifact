@@ -4,6 +4,9 @@ Pythonic wrapper around Valve's Artifact API, with object mapping, filtering and
 
 Current phase: **prototype** -> very unstable API
 
+[![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://opensource.org/licenses/MIT)
+[![pypi version](https://badge.fury.io/py/pyartifact.svg)](https://badge.fury.io/py/pyartifact)
+
 ## Here's what we can do so far
 ```python
 >>> from pyartifact import Cards
@@ -19,13 +22,23 @@ Current phase: **prototype** -> very unstable API
 ...     print(card)
 ...
 The Cover of Night
+
+# Deck encoding (wrapper not done)
+>>> from pyartifact import decode_deck_string
+>>> deck_contents = decode_deck_string('ADCJQUQI30zuwEYg2ABeF1Bu94BmWIBTEkLtAKlAZakAYmHh0JsdWUvUmVkIEV4YW1wbGU_')
+>>> print(deck_contents['name'])
+Blue/Red Example
+>>> print(deck_contents['heroes'])
+[{'id': 4003, 'turn': 1}, {'id': 10006, 'turn': 1}, {'id': 10030, 'turn': 1}, {'id': 10033, 'turn': 3}, {'id': 10065, 'turn': 2}]
+>>> from pyartifact import encode_deck
+>>> print(encode_deck(deck_contents))
+ADCJQUQI30zuwEYg2ABeF1Bu94BmWIBTEkLtAKlAZakAYmHh0JsdWUvUmVkIEV4YW1wbGU_
 ```
 
 ## Plans
 
-* Implement deck code API
-* Provide text sanitizers (text atm. has html) - to markdown, strip, etc.
+* Wrap deck code API
+* Provide text sanitizers (text atm. has html) - to markdown, strip, etc., use for deck encoding/decoding
 * Add more filtering options
 * Cleanup code structure (possible performance improvements)
 * Write documentation
-* See what people actually want from this library/if it's wanted at all

@@ -20,3 +20,15 @@ class InvalidDeckString(InvalidDeck):
 
 class DeckDecodeException(PyArtifactException):
     pass
+
+
+class DeckBuilding(InvalidDeck):
+    pass
+
+
+class InvalidHeroTurn(DeckBuilding):
+    pass
+
+
+class HeroTurnFull(DeckBuilding):
+    pass

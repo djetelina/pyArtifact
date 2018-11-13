@@ -1,20 +1,23 @@
 import re
 from base64 import b64decode
-from typing import List, Tuple, Dict
+from typing import List, Tuple
 
+from .types import HeroDecodedType, CardDecodedType, DeckContents
 from ..exceptions import InvalidDeckString, DeckDecodeException
 
 ENCODED_PREFIX = 'ADC'
-CURRENT_VERSION = 2
+# Version 1: Heroes and Cards
+# Version 2: Name, Heroes and Cards
+SUPPORTED_VERSIONS = [1, 2]
 
 
-def decode_deck_string(deck_code: str) -> Tuple[str, List[Dict[str, int]], List[Dict[str, int]]]:
+def decode_deck_string(deck_code: str) -> DeckContents:
     """
     Takes in deck code, e.g. 'ADCJWkTZX05uwGDCRV4XQGy3QGLmqUBg4GQJgGLGgO7AaABR3JlZW4vQmxhY2sgRXhhbXBsZQ__'
-    and decodes it into a tuple of deck name, heroes and cards.
+    and decodes it into a dict of name, heroes and cards.
 
     :param deck_code:               Deck code
-    :return:                        Name, heroes and cards
+    :return:                        Name, heroes and cards in a dict
     :raises InvalidDeckString:      When an invalid deck string is provided, e.g. unknown version, bad checksum etc.
     :raises DeckDecodeException:    When something odd happens while decoding, possible an error in this library
     """
@@ -22,10 +25,10 @@ def decode_deck_string(deck_code: str) -> Tuple[str, List[Dict[str, int]], List[
     if not deck_bytes:
         raise InvalidDeckString("No deck bytes could be decoded from the string")
     name, heroes, cards = _parse_deck(deck_bytes)
-    return name, heroes, cards
+    return DeckContents(name=name, heroes=heroes, cards=cards)
 
 
-def _decode_string(deck_code: str) -> List[int]:
+def _decode_string(deck_code: str) -> bytearray:
     if not deck_code.startswith(ENCODED_PREFIX):
         raise InvalidDeckString("The provided deck string doesn't start with a known prefix")
 
@@ -34,7 +37,7 @@ def _decode_string(deck_code: str) -> List[int]:
     # Make valid base64 from url-safe string
     deck_code = deck_code.replace('-', '/').replace('_', '=')
     decoded = b64decode(deck_code)
-    return list(decoded)
+    return bytearray(decoded)
 
 
 def _read_bits_chunk(chunk: int, numb_bits: int, curr_shift: int, out_bits: int) -> Tuple[int, bool]:
@@ -44,7 +47,7 @@ def _read_bits_chunk(chunk: int, numb_bits: int, curr_shift: int, out_bits: int)
     return out_bits, (chunk & continue_bit) != 0
 
 
-def _read_var_encoded(base_value: int, base_bits: int, data: List[int],
+def _read_var_encoded(base_value: int, base_bits: int, data: bytearray,
                       index_start: int, index_end: int) -> Tuple[int, int]:
     out_value = 0
     delta_shift = 0
@@ -63,39 +66,46 @@ def _read_var_encoded(base_value: int, base_bits: int, data: List[int],
     return out_value, index_start
 
 
-def _parse_deck(deck_bytes: List[int]) -> Tuple[str, List[Dict[str, int]], List[Dict[str, int]]]:
+def _parse_deck(deck_bytes: bytearray) -> Tuple[str, List[HeroDecodedType], List[CardDecodedType]]:
     total_bytes: int = len(deck_bytes)
+    # Variables that will be overwritten in the first loop over the bytes
     computed_checksum: int = 0
     total_card_bytes: int = 0
     checksum: int = 0
     version_and_heroes: int = 0
     string_length: int = 0
     version: int = 0
+    # By default, card bytes start at index 3, except in version 1, where it starts at 2,
+    # because it doesn't carry the name of the deck (and therefore the length of the name)
+    current_index: int = 3
     for index, deck_byte in enumerate(deck_bytes):
         if index == 0:
             version_and_heroes = deck_byte
             version = version_and_heroes >> 4
-            if CURRENT_VERSION != version:
-                raise InvalidDeckString("Loading unknown deck string version")
+            if version not in SUPPORTED_VERSIONS:
+                raise InvalidDeckString(f"Deck string has incompatible version '{version}', "
+                                        f"supported versions are: {SUPPORTED_VERSIONS}")
         elif index == 1:
             checksum = deck_byte
         elif index == 2:
             string_length = 0
             if version > 1:
                 string_length = deck_byte
+            else:
+                computed_checksum += deck_byte
+                current_index = 2
             total_card_bytes = total_bytes - string_length
         elif index in range(3, total_card_bytes):
             computed_checksum += deck_byte
         else:
             break
-    current_index: int = 3
     masked = computed_checksum & 0xFF
     if checksum != masked:
         raise InvalidDeckString("Checksum is wrong")
 
     number_of_heroes, current_index = _read_var_encoded(version_and_heroes, 3, deck_bytes, current_index,
                                                         total_card_bytes)
-    heroes = []
+    heroes: List[HeroDecodedType] = []
     previous_card_base: int = 0
     for i in range(number_of_heroes):
         current_index, previous_card_base, hero_turn, hero_card_id = _read_serialized_card(deck_bytes,
@@ -104,25 +114,25 @@ def _parse_deck(deck_bytes: List[int]) -> Tuple[str, List[Dict[str, int]], List[
                                                                                            previous_card_base)
         heroes.append(dict(id=hero_card_id, turn=hero_turn))
 
-    cards = []
+    cards: List[CardDecodedType] = []
     previous_card_base = 0
-    while current_index <= total_card_bytes:
+    while current_index < total_card_bytes:
         current_index, previous_card_base, card_count, card_id = _read_serialized_card(deck_bytes,
                                                                                        current_index,
                                                                                        total_bytes,
                                                                                        previous_card_base)
         cards.append(dict(id=card_id, count=card_count))
     name = ''
-    if current_index <= total_bytes:
+    if current_index < total_bytes:
         some_bytes = deck_bytes[(-1 * string_length):]
-        some_bytes = map(chr, some_bytes)
-        name = ''.join(some_bytes)
+        some_chars = map(chr, some_bytes)
+        name = ''.join(some_chars)
         # WIP simple sanitizer
         name = re.sub('<[^<]+?>', '', name)
     return name, heroes, cards
 
 
-def _read_serialized_card(data: List[int], index_start: int, index_end: int, prev_card_base: int) -> Tuple[int, int, int, int]:
+def _read_serialized_card(data: bytearray, index_start: int, index_end: int, prev_card_base: int) -> Tuple[int, int, int, int]:
     if index_start > index_end:
         raise DeckDecodeException("Invalid indexes during reading serialized card")
 
