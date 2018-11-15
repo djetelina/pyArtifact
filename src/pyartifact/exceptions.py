@@ -32,3 +32,7 @@ class InvalidHeroTurn(DeckBuilding):
 
 class HeroTurnFull(DeckBuilding):
     pass
+
+
+class DeckEncodeException(PyArtifactException):
+    pass
