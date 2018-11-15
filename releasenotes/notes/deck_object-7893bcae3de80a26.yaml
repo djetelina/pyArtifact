@@ -1,0 +1,25 @@
+---
+prelude: >
+  A simple Deck wrapper has been designed and is ready to be tested :)
+features:
+  - :py:class:`pyartifact.Deck` has been 'done' (still prototype version). To use it, all sets have to be loaded.
+  - |
+    :py:class:`pyartifact.deck.Overview` has been added as a property of the deck.
+    It offers a quick glance over the contents of the deck
+  - |
+    :py:class:`pyartifact.filtering.CardFilter` now has a `sub_type` filter
+    (no `sub_type_in` and `sub_type_not_in` variants just yet)
+  - |
+    :py:class:`pyartifact.filtering.CardFilter` now works internally with list of cards
+    instead of a set, to be able to filter through deck contents etc.
+fixes:
+  - |
+    :py:func:`pyartifact.decode_deck_string` and :py:func:`pyartifact.encode_deck` have been refactored
+    and very well docummented and commented. It should now be fairly easy to understand!
+other:
+  - |
+    Mypy is an a** and we won't be working with him again. Killer of productivity that only complicated code.
+    His paws might still be seen here and there, if you see a weird piece of code that could be simplified
+    if it didn't require mypy to pass, feel free to point it out.
+    (Typing is still useful and this library should stay pycharm compatible, no warnings raised there!)
+  - Tons of docstrings were added in preparation for sphinx autodoc

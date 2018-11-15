@@ -25,6 +25,6 @@ def test_decode_deck_deck_string(deck_code):
 def test_deck_encoding(cards, deck_code):
     deck = Deck.from_code(deck_code['string'])
     assert deck.name == deck_code['name']
-    assert len(deck._heroes.as_list) == 5
+    assert len(deck.heroes) == 5
     if deck_code['version'] >= 2:
         assert deck.deck_code == deck_code['string']

@@ -2,8 +2,8 @@ import re
 from base64 import b64decode
 from typing import List, Tuple
 
-from .types import HeroDecodedType, CardDecodedType, DeckContents
 from ..exceptions import InvalidDeckString, DeckDecodeException
+from ..types.deck_types import HeroDeckType, CardDeckType, DeckContents
 
 # Version 1: Heroes and Cards
 # Version 2: Name, Heroes and Cards
@@ -58,18 +58,18 @@ class Decoder:
                                                                          self._card_bytes_start_index,
                                                                          self._total_card_bytes)
         # Read the list of heroes
-        heroes: List[HeroDecodedType] = []
+        heroes: List[HeroDeckType] = []
         self._previous_card_base: int = 0
         for _ in range(self._heroes_count):
             hero_turn, hero_card_id = self._read_serialized_card(read_until_index=self._total_card_bytes)
-            heroes.append(HeroDecodedType(id=hero_card_id, turn=hero_turn))
+            heroes.append(HeroDeckType(id=hero_card_id, turn=hero_turn))
 
         # Read the list of cards
-        cards: List[CardDecodedType] = []
+        cards: List[CardDeckType] = []
         self._previous_card_base = 0
         while self._current_index < self._total_card_bytes:
             card_count, card_id = self._read_serialized_card(read_until_index=len(self._binary))
-            cards.append(CardDecodedType(id=card_id, count=card_count))
+            cards.append(CardDeckType(id=card_id, count=card_count))
 
         # Read the name if it's present
         if self._name_length:
@@ -79,7 +79,7 @@ class Decoder:
         else:
             name = ''
 
-        self._deck_contents = DeckContents(name=name, heroes=heroes, cards=cards)
+        self._deck_contents: DeckContents = DeckContents(name=name, heroes=heroes, cards=cards)
 
     def _get_version_and_heroes(self) -> None:
         """Reads the deck code version and first part of number of heroes from the first byte."""

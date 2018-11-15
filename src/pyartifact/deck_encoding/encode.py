@@ -7,8 +7,8 @@ That is then encoded to base64 and sanitized for url usage.
 import re
 from base64 import b64encode
 
-from pyartifact.exceptions import DeckEncodeException
-from .types import DeckContents
+from ..exceptions import DeckEncodeException
+from ..types.deck_types import DeckContents
 
 # Version 1: Heroes and Cards
 # Version 2: Name, Heroes and Cards

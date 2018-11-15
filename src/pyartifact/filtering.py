@@ -1,15 +1,13 @@
-from typing import Optional, Iterable, Set, Union, List, Tuple, cast
+from typing import Optional, Iterable, Union, List, Tuple
 
 from .exceptions import UnknownFilterArgument
-from .sets_and_cards import CardSet, CardTypes, CardTypesInstanced, AVAILABLE_TYPES, STR_TO_CARD_TYPE, Improvement, \
-    Creep, Spell, Item, Hero
+from .sets_and_cards import CardSet, CardTypes, CardTypesInstanced, AVAILABLE_TYPES, STR_TO_CARD_TYPE
 
 
 def convert_card_type(type_: Union[str, CardTypes]) -> CardTypes:
     if isinstance(type_, AVAILABLE_TYPES):
         return type_
     else:
-        type_ = cast(str, type_)
         try:
             return STR_TO_CARD_TYPE[type_]
         except KeyError:
@@ -27,11 +25,11 @@ class CardFilter:
             Optional[Iterable[CardSet]] = None,
             cards: Optional[Iterable[CardTypesInstanced]] = None
     ) -> None:
-        self.cards: Set[CardTypesInstanced] = set(cards) if cards else set()
+        self.cards: List[CardTypesInstanced] = list(cards) if cards else list()
         if sets:
             for card_set in sets:
                 for card in card_set.data.card_list:  # type: ignore
-                    self.cards.add(card)
+                    self.cards.append(card)
         self._filtered: List[CardTypesInstanced] = []
 
     def __len__(self) -> int:
@@ -81,7 +79,6 @@ class CardFilter:
     def rarity(self, rarity: str) -> 'CardFilter':
         for card in self.cards:
             if hasattr(card, 'rarity'):
-                card = cast(Union[Hero, Creep, Improvement, Improvement], card)
                 if card.rarity == rarity:
                     self._filtered.append(card)
         return CardFilter(cards=self._filtered)
@@ -89,7 +86,6 @@ class CardFilter:
     def rarity_in(self, rarities: List[str]) -> 'CardFilter':
         for card in self.cards:
             if hasattr(card, 'rarity'):
-                card = cast(Union[Hero, Creep, Improvement, Improvement], card)
                 if card.rarity in rarities:
                     self._filtered.append(card)
         return CardFilter(cards=self._filtered)
@@ -97,7 +93,6 @@ class CardFilter:
     def rarity_not_in(self, rarities: List[str]) -> 'CardFilter':
         for card in self.cards:
             if hasattr(card, 'rarity'):
-                card = cast(Union[Hero, Creep, Improvement, Improvement], card)
                 if card.rarity not in rarities:
                     self._filtered.append(card)
         return CardFilter(cards=self._filtered)
@@ -105,7 +100,6 @@ class CardFilter:
     def color(self, color: str) -> 'CardFilter':
         for card in self.cards:
             if hasattr(card, 'color'):
-                card = cast(Union[Hero, Spell, Creep, Improvement], card)
                 if card.color == color.lower():
                     self._filtered.append(card)
         return CardFilter(cards=self._filtered)
@@ -114,7 +108,6 @@ class CardFilter:
         colors = [color.lower() for color in colors]
         for card in self.cards:
             if hasattr(card, 'color'):
-                card = cast(Union[Hero, Spell, Creep, Improvement], card)
                 if card.color in colors:
                     self._filtered.append(card)
         return CardFilter(cards=self._filtered)
@@ -123,7 +116,6 @@ class CardFilter:
         colors = [color.lower() for color in colors]
         for card in self.cards:
             if hasattr(card, 'color'):
-                card = cast(Union[Hero, Spell, Creep, Improvement], card)
                 if card.color not in colors:
                     self._filtered.append(card)
         return CardFilter(cards=self._filtered)
@@ -148,7 +140,6 @@ class CardFilter:
         """
         for card in self.cards:
             if hasattr(card, 'mana_cost'):
-                card = cast(Union[Spell, Creep, Improvement], card)
                 if gt is not None and card.mana_cost > gt:
                     self._filtered.append(card)
                 elif gte is not None and card.mana_cost >= gte:
@@ -181,7 +172,6 @@ class CardFilter:
         """
         for card in self.cards:
             if hasattr(card, 'gold_cost'):
-                card = cast(Item, card)
                 if gt is not None and card.gold_cost > gt:
                     self._filtered.append(card)
                 elif gte is not None and card.gold_cost >= gte:
@@ -192,4 +182,15 @@ class CardFilter:
                     self._filtered.append(card)
                 elif eq is not None and card.gold_cost == eq:
                     self._filtered.append(card)
+        return CardFilter(cards=self._filtered)
+
+    def sub_type(self, sub_type: str) -> 'CardFilter':
+        """
+        Filters out everything but items and leaves just items with a subtype equal to the provided string
+
+        :param sub_type:    Sub type of an item
+        """
+        for card in self.cards:
+            if getattr(card, 'sub_type') == sub_type:
+                self._filtered.append(card)
         return CardFilter(cards=self._filtered)

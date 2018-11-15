@@ -2,7 +2,7 @@ from typing import Optional, List, Union, Type, Dict
 
 import requests
 
-from .context import ctx
+from ._context import ctx
 from .types.json_types import CardSetType, SetInfoType, SetDataType, ReferenceType
 
 
@@ -27,6 +27,7 @@ class CardBase:
 
     @property
     def includes(self) -> List['CardTypesInstanced']:
+        """List of all the cards this card includes automatically in a deck."""
         includes = []
         for ref in self.__references:
             if ref['ref_type'] == 'includes':
@@ -37,6 +38,7 @@ class CardBase:
 
     @property
     def passive_abilities(self) -> List['PassiveAbility']:
+        """List of the cards passive abilities"""
         passive_abilities = []
         for ref in self.__references:
             if ref['ref_type'] == 'passive_ability':
@@ -46,6 +48,7 @@ class CardBase:
 
     @property
     def active_abilities(self) -> List['Ability']:
+        """List of the cards active abilities"""
         abilities = []
         for ref in self.__references:
             if ref['ref_type'] == 'active_ability':
@@ -55,6 +58,7 @@ class CardBase:
 
     @property
     def references(self) -> List['CardTypesInstanced']:
+        """List of cards that this card references"""
         references = []
         for ref in self.__references:
             if ref['ref_type'] == 'references':
@@ -85,7 +89,7 @@ class Unit:
 
 
 class Collectible:
-    """Doesn't mean that EVERY card of that type is Collectible, all have exceptions"""
+    """Doesn't mean that EVERY card of that type is Collectible, all subtypes have a few  exceptions in the base set."""
     def __init__(self, **kwargs) -> None:
         self.rarity: Optional[str] = kwargs.get('rarity')
         self.item_def: Optional[int] = kwargs.get('item_def')
@@ -164,7 +168,7 @@ CardTypes = Union[
     Type[Item], Type[Hero], Type[Ability], Type[PassiveAbility],
     Type[Improvement], Type[Creep], Type[Spell]
 ]
-STR_TO_CARD_TYPE = {
+STR_TO_CARD_TYPE: Dict[str, CardTypes] = {
     'Hero': Hero,
     'Passive Ability': PassiveAbility,
     'Spell': Spell,
@@ -172,7 +176,7 @@ STR_TO_CARD_TYPE = {
     'Ability': Ability,
     'Item': Item,
     'Improvement': Improvement
-}  # type: Dict[str, CardTypes]
+}
 AVAILABLE_TYPES = (Item, Hero, Ability, PassiveAbility, Improvement, Creep, Spell)
 
 
@@ -205,5 +209,5 @@ class CardSet:
     def load(self) -> None:
         cdn_info = requests.get(self.url).json()
         self.expire_time = cdn_info['expire_time']
-        data = requests.get(f"{cdn_info['cdn_root']}{cdn_info['url']}").json()  # type: SetDataType
+        data: SetDataType = requests.get(f"{cdn_info['cdn_root']}{cdn_info['url']}").json()
         self.data = CardSetData(data['card_set'])
