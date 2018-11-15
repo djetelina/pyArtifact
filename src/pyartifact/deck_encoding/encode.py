@@ -47,34 +47,31 @@ class Encoder:
         self.cards = sorted(deck_contents['cards'], key=lambda x: x['id'])
         name = deck_contents.get('name', '')[:63]  # name has a hard limit of 63 characters (V2)
         self.name = re.sub('<[^<]+?>', '', name)
-        self.binary = bytearray()  # This where all our hard work will end in, before being interpreted as string
+        self._binary = bytearray()  # This where all our hard work will end in, before being interpreted as string
 
     @property
     def deck_code(self) -> str:
         """Returns the deck code for the deck contents provided."""
-        # So we don't have to call encode manually every time
-        self._encode()
-        # Binary to immutable bytes, then base64 encode and decode to unicode
-        encoded = b64encode(bytes(self.binary)).decode()
-        # Add prefix
+        self._encode_to_binary()
+        encoded = b64encode(bytes(self._binary)).decode()
         deck_code = f'{self.prefix}{encoded}'
         # url safe (no, base64.urlsafe_b64encode wouldn't do the trick, different replacements in this case)
         deck_code = deck_code.replace('/', '-').replace('=', '_')
         return deck_code
 
-    def _encode(self) -> bytearray:
+    def _encode_to_binary(self) -> bytearray:
         """Heavy lifting for the encoding."""
-        # First byte is version and number of heroes
+        # First byte is deck code version and number of heroes
         version = (self.version << 4) | _extract_n_bits(len(self.heroes), 3)
-        self.binary.append(version)
+        self._binary.append(version)
 
-        # Put placeholder for checksum as second byte
+        # Put placeholder for checksum as the second byte
         placeholder_checksum = 0
-        checksum_index = len(self.binary)
-        self.binary.append(placeholder_checksum)
+        checksum_index = len(self._binary)
+        self._binary.append(placeholder_checksum)
 
         # Length of the name string is the 3rd byte
-        self.binary.append(len(self.name))
+        self._binary.append(len(self.name))
         # Add remaining number of heroes to the next byte if needed (happens with 8+ heroes)
         self._add_remaining_bits_from_number(len(self.heroes), 3)
 
@@ -90,17 +87,15 @@ class Encoder:
             self._add_card(card['count'], card['id'] - previous_card_id)
             previous_card_id = card['id']
 
-        # Now we'll be adding name of the deck, note down at which index we'll be starting
-        name_start_index = len(self.binary)
-        # Encode our beautiful unicode string to bytes, then convert to bytearray
+        # We'll finish of the binary data with the name,
+        # note down at which index we'll be starting to not include it in the checksum
+        name_start_index = len(self._binary)
         name_bytes = bytearray(self.name.encode())
-        # Add the encoded name at the end
-        for name_byte in name_bytes:
-            self.binary.append(name_byte)
+        self._binary += name_bytes
 
-        # Compute the checksum and replace it at the index we previously indexed
-        self.binary[checksum_index] = sum(b for b in self.binary[self.header_size:name_start_index]) & 255
-        return self.binary
+        # Compute the checksum and replace the placeholder
+        self._binary[checksum_index] = sum(b for b in self._binary[self.header_size:name_start_index]) & 255
+        return self._binary
 
     def _add_remaining_bits_from_number(self, value: int, already_written_bits: int) -> None:
         """Adds the remaining bits from the number we extracted some bits from previously."""
@@ -108,15 +103,15 @@ class Encoder:
         while value > 0:
             next_byte = _extract_n_bits(value, 7)
             value >>= 7
-            self.binary.append(next_byte)
+            self._binary.append(next_byte)
 
     def _add_card(self, count_or_turn: int, value: int) -> None:
         """Adds a card to the bytearray"""
         # Note down the index we start at
-        bytes_start = len(self.binary)
+        bytes_start = len(self._binary)
         # max count in the first byte
         first_byte_max_count = 3
-        # Whether the count (or count) exceeds the max
+        # Whether the count (or turn) exceeds the max
         extended_count = ((count_or_turn - 1) >= first_byte_max_count)
         # If up to number 3 was provided as first argument, we us that -1, otherwise we use the maximum - 3
         first_byte_count = first_byte_max_count if extended_count else (count_or_turn - 1)
@@ -125,13 +120,13 @@ class Encoder:
         # We bitwise or the number we got with the first 5 bits of the value (card id difference)
         first_byte |= _extract_n_bits(value, 5)
         # And write the first byte into our array
-        self.binary.append(first_byte)
+        self._binary.append(first_byte)
         # After the first byte we add the value (difference in card_id from the previous card_id)
         self._add_remaining_bits_from_number(value, 5)
         # If we couldn't fit the count (or turn) into the first byte and we used 3, we need to add it here
         if extended_count:
             self._add_remaining_bits_from_number(count_or_turn, 0)
-        count_bytes_end = len(self.binary)
+        count_bytes_end = len(self._binary)
         # If we exceeded 11 bytes, we are doomed, probably api version v3 will be needed by then, no instructions now
         if count_bytes_end - bytes_start > 11:
             raise DeckEncodeException("Something went horribly wrong")

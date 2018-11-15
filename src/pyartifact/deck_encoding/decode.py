@@ -42,15 +42,13 @@ class Decoder:
         return self._deck_contents
 
     def _decode_string(self) -> None:
-        # Deck string always starts with a prefix
         if not self.deck_code.startswith(self.prefix):
             raise InvalidDeckString("The provided deck string doesn't start with a known prefix")
         # Strip the prefix and turn it into a valid base64 from url-safe string
         deck_code_b64 = self.deck_code.lstrip(self.prefix).replace('-', '/').replace('_', '=')
         decoded = b64decode(deck_code_b64)
-        # Fill the binary data from which to read
         self._binary = bytearray(decoded)
-        # If something funky happened, let the user that it's terrible
+        # If something funky happened, let the user know that it's terrible
         if not self._binary:
             raise InvalidDeckString("No binary data could be decoded from the string")
 
@@ -157,13 +155,13 @@ class Decoder:
         card_id = self._previous_card_base + card_id_delta
         # If the header didn't have the real count information, read it from the next bytes
         if (header >> 6) == 3:
-            out_count, self._current_index = self._read_var_encoded(0, 0, self._current_index, read_until_index)
+            count, self._current_index = self._read_var_encoded(0, 0, self._current_index, read_until_index)
         else:
             # If the header had it, shift it and subtract 2 from it
-            out_count = (header >> 6) + 1
-        # Set the current card id as the previous one for the upcoming card
+            count = (header >> 6) + 1
+
         self._previous_card_base = card_id
-        return out_count, card_id
+        return count, card_id
 
 
 def _read_bits_chunk(chunk: int, numb_bits: int, curr_shift: int, out_bits: int) -> Tuple[int, bool]:
