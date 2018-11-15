@@ -27,15 +27,15 @@ def encode_deck(deck_contents: DeckContents, version: int = SUPPORTED_VERSIONS[-
 
 
 class Encoder:
-    header_size = 3
-    prefix = 'ADC'
-
     """
     Main purpose of this class is to hold shared data across the encoding process.
 
     There shouldn't be a need to use this part of the library, It offers a more low level access
     to the encoding process, but doesn't offer anything more practical than :py:func:`pyartifact.encode_deck` does.
     """
+    header_size = 3
+    prefix = 'ADC'
+
     def __init__(self, deck_contents: DeckContents, version: int = SUPPORTED_VERSIONS[-1]) -> None:
         """
         :param deck_contents:       The deck contents.
@@ -53,8 +53,7 @@ class Encoder:
     def deck_code(self) -> str:
         """Returns the deck code for the deck contents provided."""
         # So we don't have to call encode manually every time
-        if not self.binary:
-            self._encode()
+        self._encode()
         # Binary to immutable bytes, then base64 encode and decode to unicode
         encoded = b64encode(bytes(self.binary)).decode()
         # Add prefix
