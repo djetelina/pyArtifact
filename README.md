@@ -7,6 +7,7 @@ Current phase: **prototype** -> very unstable API
 [![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://opensource.org/licenses/MIT)
 [![pypi version](https://badge.fury.io/py/pyartifact.svg)](https://badge.fury.io/py/pyartifact)
 [![Documentation Status](https://readthedocs.org/projects/pyartifact/badge/?version=latest)](https://pyartifact.readthedocs.io/en/latest/?badge=latest)
+[![Build Status](https://travis-ci.org/iScrE4m/pyArtifact.svg?branch=master)](https://travis-ci.org/iScrE4m/pyArtifact)
 
 
 ## Here's what we can do so far
