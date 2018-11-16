@@ -49,6 +49,12 @@ class CardFilter:
         return list(self.cards)[item]
 
     def type(self, type_: Union[str, CardTypes], filter_out=False) -> 'CardFilter':
+        """
+        Filters for a single type (or anything but a single type)
+
+        :param type_:       Type of the card
+        :param filter_out:  Whether to filter that type out
+        """
         type_ = convert_card_type(type_)
         for card in self.cards:
             if filter_out:
@@ -84,6 +90,11 @@ class CardFilter:
         return CardFilter(cards=self._filtered)
 
     def rarity(self, rarity: str) -> 'CardFilter':
+        """
+        Filters for a rarity
+
+        :param rarity:      Rarity
+        """
         for card in self.cards:
             if hasattr(card, 'rarity'):
                 if card.rarity == rarity:
@@ -91,6 +102,11 @@ class CardFilter:
         return CardFilter(cards=self._filtered)
 
     def rarity_in(self, rarities: List[str]) -> 'CardFilter':
+        """
+        Filters for multiple rarities
+
+        :param rarities:    Rarities
+        """
         for card in self.cards:
             if hasattr(card, 'rarity'):
                 if card.rarity in rarities:
@@ -98,6 +114,11 @@ class CardFilter:
         return CardFilter(cards=self._filtered)
 
     def rarity_not_in(self, rarities: List[str]) -> 'CardFilter':
+        """
+        Filters out cards of specified rarities.
+
+        :param rarities:    Rarities
+        """
         for card in self.cards:
             if hasattr(card, 'rarity'):
                 if card.rarity not in rarities:
@@ -105,6 +126,11 @@ class CardFilter:
         return CardFilter(cards=self._filtered)
 
     def color(self, color: str) -> 'CardFilter':
+        """
+        Filters for a single color.
+
+        :param color:   Color
+        """
         for card in self.cards:
             if hasattr(card, 'color'):
                 if card.color == color.lower():
@@ -112,6 +138,11 @@ class CardFilter:
         return CardFilter(cards=self._filtered)
 
     def color_in(self, colors: Iterable[str]) -> 'CardFilter':
+        """
+        Filters for multiple colors.
+
+        :param colors:  Colors
+        """
         colors = [color.lower() for color in colors]
         for card in self.cards:
             if hasattr(card, 'color'):
@@ -120,6 +151,11 @@ class CardFilter:
         return CardFilter(cards=self._filtered)
 
     def color_not_in(self, colors: Iterable[str]) -> 'CardFilter':
+        """
+        For filtering out colors
+
+        :param colors:  Colors
+        """
         colors = [color.lower() for color in colors]
         for card in self.cards:
             if hasattr(card, 'color'):
