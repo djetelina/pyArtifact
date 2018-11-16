@@ -1,0 +1,4 @@
+Filtering
+---------
+
+.. automodule:: pyartifact.filtering

@@ -7,7 +7,29 @@ from .types.json_types import CardSetType, SetInfoType, SetDataType, ReferenceTy
 
 
 class CardBase:
-    """Each card has this."""
+    """
+    All cards (and abilities) inherit the base.
+
+    +--------------+------+-----------------------------------------------------------------------+
+    | Attribute    | Type | Contents                                                              |
+    +==============+======+=======================================================================+
+    | id           | int  | Id of the card                                                        |
+    +--------------+------+-----------------------------------------------------------------------+
+    | base_id      | int  | Currently same as id                                                  |
+    +--------------+------+-----------------------------------------------------------------------+
+    | name         | str  | Name of the card                                                      |
+    +--------------+------+-----------------------------------------------------------------------+
+    | type         | str  | Type of the card, also indicated by the actual class holding the card |
+    +--------------+------+-----------------------------------------------------------------------+
+    | text         | str  | Text on the card, includes html                                       |
+    +--------------+------+-----------------------------------------------------------------------+
+    | mini_image   | str  | Url to mini image                                                     |
+    +--------------+------+-----------------------------------------------------------------------+
+    | large_image  | str  | Url to large image                                                    |
+    +--------------+------+-----------------------------------------------------------------------+
+    | ingame_image | str  | Url to ingame image                                                   |
+    +--------------+------+-----------------------------------------------------------------------+
+    """
     def __init__(self, **kwargs) -> None:
         self.id: int = kwargs['card_id']
         self.base_id: int = kwargs['base_card_id']
@@ -17,7 +39,7 @@ class CardBase:
         self.mini_image: str = kwargs['mini_image'].get('default')
         self.large_image: str = kwargs['large_image'].get('default')
         self.ingame_image: str = kwargs['ingame_image'].get('default')
-        self.__references: List[ReferenceType] = kwargs['references']
+        self._references: List[ReferenceType] = kwargs['references']
 
     def __str__(self) -> str:
         return self.name
@@ -26,41 +48,10 @@ class CardBase:
         return f'<Artifact card: {self.__dict__}>'
 
     @property
-    def includes(self) -> List['CardTypesInstanced']:
-        """List of all the cards this card includes automatically in a deck."""
-        includes = []
-        for ref in self.__references:
-            if ref['ref_type'] == 'includes':
-                included = ctx.cards_by_id[ref['card_id']]
-                for _ in range(ref['count']):
-                    includes.append(included)
-        return includes
-
-    @property
-    def passive_abilities(self) -> List['PassiveAbility']:
-        """List of the cards passive abilities"""
-        passive_abilities = []
-        for ref in self.__references:
-            if ref['ref_type'] == 'passive_ability':
-                ability = ctx.cards_by_id[ref['card_id']]
-                passive_abilities.append(ability)
-        return passive_abilities
-
-    @property
-    def active_abilities(self) -> List['Ability']:
-        """List of the cards active abilities"""
-        abilities = []
-        for ref in self.__references:
-            if ref['ref_type'] == 'active_ability':
-                ability = ctx.cards_by_id[ref['card_id']]
-                abilities.append(ability)
-        return abilities
-
-    @property
     def references(self) -> List['CardTypesInstanced']:
         """List of cards that this card references"""
         references = []
-        for ref in self.__references:
+        for ref in self._references:
             if ref['ref_type'] == 'references':
                 reference = ctx.cards_by_id[ref['card_id']]
                 references.append(reference)
@@ -68,6 +59,15 @@ class CardBase:
 
 
 class ColoredCard:
+    """
+    Cards that belong under a certain color.
+
+    +--------------+------+-----------------------------------------------------------------------+
+    | Attribute    | Type | Contents                                                              |
+    +==============+======+=======================================================================+
+    | color        | str  | blue, black, red, green or unknown. There are no multicolor cards yet |
+    +--------------+------+-----------------------------------------------------------------------+
+    """
     def __init__(self, **kwargs) -> None:
         if kwargs.get('is_blue', False):
             self.color: str = 'blue'
@@ -82,83 +82,169 @@ class ColoredCard:
 
 
 class Unit:
+    """
+    Cards that can be deployed to a battlefield and fight
+
+    +--------------+------+---------------------------------+
+    | Attribute    | Type | Contents                        |
+    +==============+======+=================================+
+    | attack       | int  | Attack of the unit              |
+    +--------------+------+---------------------------------+
+    | armor        | int  | Armor of the unit               |
+    +--------------+------+---------------------------------+
+    | hit_points   | int  | Hit points (health) of the unit |
+    +--------------+------+---------------------------------+
+
+    """
     def __init__(self, **kwargs) -> None:
         self.attack: int = kwargs.get('attack', 0)
         self.armor: int = kwargs.get('armor', 0)
         self.hit_points: int = kwargs.get('hit_points', 0)
 
 
-class Collectible:
-    """Doesn't mean that EVERY card of that type is Collectible, all subtypes have a few  exceptions in the base set."""
+class NotAbility:
+    """
+    Cards that are not abilities. Card API provides abilities and passive abilities alongside cards,
+    so in the context of this library they are treated as cards.
+
+
+
+    +--------------+----------------+-----------------------------------------------------------------------+
+    | Attribute    | Type           | Contents                                                              |
+    +==============+================+=======================================================================+
+    | rarity       | Optional[str]  | Rarity of the card, if it has one (base set cards don't have a rarity |
+    +--------------+----------------+-----------------------------------------------------------------------+
+    | item_def     | Optional[int]  | Unknown integer, only present when rarity is present                  |
+    +--------------+----------------+-----------------------------------------------------------------------+
+    | illustrator  | str            | Name of the illustrator that drew the card art                        |
+    +--------------+----------------+-----------------------------------------------------------------------+
+    """
     def __init__(self, **kwargs) -> None:
         self.rarity: Optional[str] = kwargs.get('rarity')
         self.item_def: Optional[int] = kwargs.get('item_def')
+        self.illustrator: str = kwargs['illustrator']
+
+    @property
+    def active_abilities(self) -> List['Ability']:
+        """List of the cards active abilities"""
+        abilities = []
+        for ref in self._references:
+            if ref['ref_type'] == 'active_ability':
+                ability = ctx.cards_by_id[ref['card_id']]
+                abilities.append(ability)
+        return abilities
 
 
 class Castable:
+    """
+    Cards that can be casted for mana.
+
+    +--------------+------+---------------------------------+
+    | Attribute    | Type | Contents                        |
+    +==============+======+=================================+
+    | mana_cost    | int  | Mana cost to cast the card      |
+    +--------------+------+---------------------------------+
+    """
     def __init__(self, **kwargs) -> None:
         self.mana_cost: int = kwargs['mana_cost']
 
 
-class Hero(CardBase, ColoredCard, Unit, Collectible):
+class Hero(CardBase, ColoredCard, Unit, NotAbility):
+    """Inherts from :py:class:`CardBase`, :py:class:`ColoredCard`, :py:class:`Unit` and :py:class:`NotAbility`."""
     def __init__(self, **kwargs) -> None:
         CardBase.__init__(self, **kwargs)
         ColoredCard.__init__(self, **kwargs)
         Unit.__init__(self, **kwargs)
-        Collectible.__init__(self, **kwargs)
-        self.illustrator: str = kwargs['illustrator']
+        NotAbility.__init__(self, **kwargs)
+
+    @property
+    def includes(self) -> List[Union['Spell', 'Creep', 'Improvement']]:
+        """List of all the cards this card includes automatically in a deck."""
+        includes = []
+        for ref in self._references:
+            if ref['ref_type'] == 'includes':
+                included = ctx.cards_by_id[ref['card_id']]
+                for _ in range(ref['count']):
+                    includes.append(included)
+        return includes
+
+    @property
+    def passive_abilities(self) -> List['PassiveAbility']:
+        """List of the cards passive abilities"""
+        passive_abilities = []
+        for ref in self._references:
+            if ref['ref_type'] == 'passive_ability':
+                ability = ctx.cards_by_id[ref['card_id']]
+                passive_abilities.append(ability)
+        return passive_abilities
 
 
 class PassiveAbility(CardBase):
+    """Inherits from :py:class:`CardBase`."""
     def __init__(self, **kwargs) -> None:
         CardBase.__init__(self, **kwargs)
 
 
-class Spell(CardBase, ColoredCard, Collectible, Castable):
+class Spell(CardBase, ColoredCard, NotAbility, Castable):
+    """Inherits from :py:class:`CardBase`, :py:class:`ColoredCard`, :py:class:`NotAbility` and :py:class:`Castable`."""
     def __init__(self, **kwargs) -> None:
         CardBase.__init__(self, **kwargs)
         ColoredCard.__init__(self, **kwargs)
-        Collectible.__init__(self, **kwargs)
+        NotAbility.__init__(self, **kwargs)
         Castable.__init__(self, **kwargs)
-        self.illustrator: str = kwargs['illustrator']
 
 
-class Creep(CardBase, ColoredCard, Unit, Collectible, Castable):
+class Creep(CardBase, ColoredCard, Unit, NotAbility, Castable):
+    """
+    Inherits from :py:class:`CardBase`, :py:class:`ColoredCard`,
+    :py:class:`Unit`, :py:class:`NotAbility`, :py:class:`Castable`.
+    """
     def __init__(self, **kwargs):
         CardBase.__init__(self, **kwargs)
         ColoredCard.__init__(self, **kwargs)
         Unit.__init__(self, **kwargs)
-        Collectible.__init__(self, **kwargs)
+        NotAbility.__init__(self, **kwargs)
         Castable.__init__(self, **kwargs)
-        self.illustrator: Optional[str] = kwargs.get('illustrator')
 
 
 class Ability(CardBase):
+    """Inherits from :py:class:`CardBase`."""
     def __init__(self, **kwargs) -> None:
         CardBase.__init__(self, **kwargs)
 
 
-class Item(CardBase, Collectible):
+class Item(CardBase, NotAbility):
+    """
+    Inherits from :py:class:`CardBase`, :py:class:`NotAbility`. Also has two attributes unique to this type.
+
+    +--------------+--------+-----------------------------------------------------------------------+
+    | Attribute    | Type   | Contents                                                              |
+    +==============+========+=======================================================================+
+    | gold_cost    | int    | How much gold does it take to purchase from the shop.                 |
+    +--------------+--------+-----------------------------------------------------------------------+
+    | sub_type     | str    | Subtype of the item - Weapon, Accessory, Armor, Consumable or Deed    |
+    +--------------+--------+-----------------------------------------------------------------------+
+    """
     def __init__(self, **kwargs) -> None:
         CardBase.__init__(self, **kwargs)
-        Collectible.__init__(self, **kwargs)
-        self.illustrator: str = kwargs['illustrator']
+        NotAbility.__init__(self, **kwargs)
         self.gold_cost: int = kwargs['gold_cost']
         self.sub_type: str = kwargs['sub_type']
 
 
-class Improvement(CardBase, ColoredCard, Collectible, Castable):
+class Improvement(CardBase, ColoredCard, NotAbility, Castable):
+    """Inherits from CardBase, ColoredCard, NotAbility, Castable."""
     def __init__(self, **kwargs) -> None:
         CardBase.__init__(self, **kwargs)
         ColoredCard.__init__(self, **kwargs)
-        Collectible.__init__(self, **kwargs)
+        NotAbility.__init__(self, **kwargs)
         Castable.__init__(self, **kwargs)
-        self.illustrator: str = kwargs['illustrator']
 
 
 class SetInfo:
+    """Information about the set - id, name and pack_item_def"""
     def __init__(self, set_info: SetInfoType) -> None:
-        self.set_id: int = set_info['set_id']
+        self.id: int = set_info['set_id']
         self.pack_item_def: int = set_info['pack_item_def']
         self.name: str = set_info['name'][ctx.language]
 
@@ -181,6 +267,7 @@ AVAILABLE_TYPES = (Item, Hero, Ability, PassiveAbility, Improvement, Creep, Spel
 
 
 class CardSetData:
+    """Cards and Set Data."""
     # Stronghold and Pathing are core game mechanics, there's no need to be indexing them
     not_indexed = ['Stronghold', 'Pathing']
 
@@ -199,6 +286,7 @@ class CardSetData:
 
 
 class CardSet:
+    """Card set."""
     base_url = 'https://playartifact.com/cardset/'
 
     def __init__(self, set_number: str) -> None:
@@ -207,6 +295,7 @@ class CardSet:
         self.data: Optional[CardSetData] = None
 
     def load(self) -> None:
+        """Loads the cards set data"""
         cdn_info = requests.get(self.url).json()
         self.expire_time = cdn_info['expire_time']
         data: SetDataType = requests.get(f"{cdn_info['cdn_root']}{cdn_info['url']}").json()

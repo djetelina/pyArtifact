@@ -25,14 +25,13 @@ class Deck:
 
     As of now, the deck object does no validations, the rules to follow are:
 
-        * Some cards have `includes`, that are automatically added to the deck and they shouldn't
-          be in the cards portion of deck contents.
-        * Abilities and Passive abilities aren't able to be included in a deck, as they come with another cards
-          and are more of a traits than cards.
-        * Heroes have their own part of deck contents, don't put them into the cards section
+    * Some cards have `includes`, that are automatically added to the deck and they shouldn't
+      be in the cards portion of deck contents.
+    * Abilities and Passive abilities aren't able to be included in a deck, as they come with another cards
+      and are more of a traits than cards.
+    * Heroes have their own part of deck contents, don't put them into the cards section
 
-    Deck code versions
-    ~~~~~~~~~~~~~~~~~~
+    **Deck code versions**
 
     Deck codes currently have two versions. We are able to load both, but only dump to version 2.
 

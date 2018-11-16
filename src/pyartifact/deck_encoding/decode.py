@@ -12,7 +12,7 @@ SUPPORTED_VERSIONS = [1, 2]
 
 def decode_deck_string(deck_code: str) -> DeckContents:
     """
-    Takes in deck code, e.g. 'ADCJWkTZX05uwGDCRV4XQGy3QGLmqUBg4GQJgGLGgO7AaABR3JlZW4vQmxhY2sgRXhhbXBsZQ__'
+    Takes in deck code, e.g. `ADCJWkTZX05uwGDCRV4XQGy3QGLmqUBg4GQJgGLGgO7AaABR3JlZW4vQmxhY2sgRXhhbXBsZQ__`
     and decodes it into a dict of name, heroes and cards.
 
     :param deck_code:               Deck code

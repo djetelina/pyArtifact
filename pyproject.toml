@@ -16,3 +16,7 @@ mypy_extensions = "^0.4.1"
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"
 flake8 = "^3.6"
+sphinx_rtd_theme = "^0.4.2"
+sphinx = "^1.8"
+sphinx-autodoc-typehints = "^1.5"
+reno = {version = "^2.11",extras = ["sphinx"]}

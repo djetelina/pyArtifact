@@ -5,7 +5,7 @@ from .sets_and_cards import CardSet, CardTypes, CardTypesInstanced, AVAILABLE_TY
 
 
 def convert_card_type(type_: Union[str, CardTypes]) -> CardTypes:
-    if isinstance(type_, AVAILABLE_TYPES):
+    if type_ in AVAILABLE_TYPES:
         return type_
     else:
         try:
@@ -19,6 +19,13 @@ def convert_card_types(card_types: Iterable[Union[str, CardTypes]]) -> Tuple[Car
 
 
 class CardFilter:
+    """
+    Class that allows you to use predefined filters to get the cards you are looking for.
+    The cards are then available in the `cards` attribute.
+
+    All filter methods return a new filter instance. That means you can both nest filtering methods
+    and save certain filter to a variables and access them later if you want to go a different path.
+    """
     def __init__(
             self,
             sets:

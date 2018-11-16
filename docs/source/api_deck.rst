@@ -1,0 +1,5 @@
+Deck
+----
+
+.. automodule:: pyartifact.deck
+
