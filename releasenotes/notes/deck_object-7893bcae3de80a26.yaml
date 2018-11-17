@@ -2,19 +2,19 @@
 prelude: >
   A simple Deck wrapper has been designed and is ready to be tested :)
 features:
-  - :py:class:`pyartifact.Deck` has been 'done' (still prototype version). To use it, all sets have to be loaded.
+  - :py:class:`Deck` has been 'done' (still prototype version). To use it, all sets have to be loaded.
   - |
-    :py:class:`pyartifact.deck.Overview` has been added as a property of the deck.
+    :py:class:`deck.Overview` has been added as a property of the deck.
     It offers a quick glance over the contents of the deck
   - |
-    :py:class:`pyartifact.filtering.CardFilter` now has a `sub_type` filter
+    :py:class:`filtering.CardFilter` now has a `sub_type` filter
     (no `sub_type_in` and `sub_type_not_in` variants just yet)
   - |
-    :py:class:`pyartifact.filtering.CardFilter` now works internally with list of cards
+    :py:class:`filtering.CardFilter` now works internally with list of cards
     instead of a set, to be able to filter through deck contents etc.
 fixes:
   - |
-    :py:func:`pyartifact.decode_deck_string` and :py:func:`pyartifact.encode_deck` have been refactored
+    :py:func:`decode_deck_string` and :py:func:`encode_deck` have been refactored
     and very well docummented and commented. It should now be fairly easy to understand!
 other:
   - |

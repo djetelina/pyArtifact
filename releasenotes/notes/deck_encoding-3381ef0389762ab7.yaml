@@ -3,12 +3,12 @@ prelude: >
     Deck encoding is now supported
 features:
   - |
-    :py:func:`pyartifact.decode_deck_string` and :py:func:`pyartifact.encode_deck`
+    :py:func:`decode_deck_string` and :py:func:`encode_deck`
     are now available, to encode and decode deck strings. It's wrapper
 issues:
   - |
     Encoding and decoding isn't very readable at the moment and could use a ton of pythonization ;)
   - |
-    :py:class:`pyartifact.Deck` - a wrapper for encoding and decoding still needs tons of design work.
+    :py:class:`Deck` - a wrapper for encoding and decoding still needs tons of design work.
     The question is whether this library should be a deck building tool, or just a lightweight wrapper,
     more focused on reporting the decks and more 'low level' edits through dictionaries that are used internally.

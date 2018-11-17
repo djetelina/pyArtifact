@@ -2,7 +2,7 @@
 fixes:
   - |
     Previously it was impossible to get some cards by name, because they shared it with an ability.
-    This is now fixed, for more read the updated docummentation of :py:meth:`pyartifact.Cards.get`
+    This is now fixed, for more read the updated docummentation of :py:meth:`Cards.get`
     The affected cards were:
 
     * Sister of the Veil
