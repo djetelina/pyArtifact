@@ -1,0 +1,36 @@
+---
+fixes:
+  - |
+    Previously it was impossible to get some cards by name, because they shared it with an ability.
+    This is now fixed, for more read the updated docummentation of :py:meth:`~pyartifact.Cards.get`
+    The affected cards were:
+
+    * Sister of the Veil
+    * Rebel Decoy
+    * Mercenary Exiles
+    * Emissary of the Quorum
+    * Ravenhook
+    * Ravenous Mass
+    * Assassin's Apprentice
+    * Satyr Magician
+    * Unsupervised Artillery
+    * Revtel Investments
+    * Aghanim's Sanctum
+    * Escape Route
+    * Messenger Rookery
+    * Keenfolk Turret
+    * Steam Cannon
+    * Assassin's Veil
+    * Phase Boots
+    * Blink Dagger
+    * Demagicking Maul
+    * Rumusque Vestments
+    * Keenfolk Musket
+    * Bracers of Sacrifice
+    * Helm of the Dominator
+    * Wingfall Hammer
+    * Book of the Dead
+    * Shiva's Guard
+    * Horn of the Alpha
+    * Nyctasha's Guard
+    * Apotheosis Blade

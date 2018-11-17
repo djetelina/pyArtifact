@@ -284,7 +284,8 @@ class CardSetData:
                 self.card_list.append(card_instance)
                 # For fast lookups
                 ctx.cards_by_id[card['base_card_id']] = card_instance
-                ctx.cards_by_name[card['card_name'][ctx.language].lower()] = card_instance
+                card_name = card['card_name'][ctx.language].lower()
+                ctx.cards_by_name[card_name].append(card_instance)
 
 
 class CardSet:
