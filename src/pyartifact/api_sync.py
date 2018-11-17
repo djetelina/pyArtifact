@@ -16,12 +16,12 @@ class Cards:
     ) -> None:
         """
         :param limit_sets:      Whether to only fetch some sets, by default all ar used ('00', and '01')
-        :param localize:        Which language to fetch strings for, at this time only english is available
+        :param localize:        Which language to fetch strings for. Will be turned into lowercase automatically.
         """
         self._set_numbers = limit_sets or ctx.all_sets
         self.sets: List[CardSet] = [CardSet(set_number) for set_number in self._set_numbers]
         if localize is not None:
-            ctx.language = localize
+            ctx.language = localize.lower()
 
     def load_all_sets(self) -> None:
         """

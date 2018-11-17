@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    With Valve publishing the translations, pyArtifact isn't far behind.
+    While the support for card text was already implemented, large images were always in english.
+    That is now not the case.
+  - Localize parameter in :py:object:`pyartifact.Cards` will now turn the language into lowercase for you.

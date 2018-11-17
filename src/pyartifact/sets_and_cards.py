@@ -10,25 +10,25 @@ class CardBase:
     """
     All cards (and abilities) inherit the base.
 
-    +--------------+------+-----------------------------------------------------------------------+
-    | Attribute    | Type | Contents                                                              |
-    +==============+======+=======================================================================+
-    | id           | int  | Id of the card                                                        |
-    +--------------+------+-----------------------------------------------------------------------+
-    | base_id      | int  | Currently same as id                                                  |
-    +--------------+------+-----------------------------------------------------------------------+
-    | name         | str  | Name of the card                                                      |
-    +--------------+------+-----------------------------------------------------------------------+
-    | type         | str  | Type of the card, also indicated by the actual class holding the card |
-    +--------------+------+-----------------------------------------------------------------------+
-    | text         | str  | Text on the card, includes html                                       |
-    +--------------+------+-----------------------------------------------------------------------+
-    | mini_image   | str  | Url to mini image                                                     |
-    +--------------+------+-----------------------------------------------------------------------+
-    | large_image  | str  | Url to large image                                                    |
-    +--------------+------+-----------------------------------------------------------------------+
-    | ingame_image | str  | Url to ingame image                                                   |
-    +--------------+------+-----------------------------------------------------------------------+
+    +--------------+----------------+-----------------------------------------------------------------------+
+    | Attribute    | Type           | Contents                                                              |
+    +==============+================+=======================================================================+
+    | id           | int            | Id of the card                                                        |
+    +--------------+----------------+-----------------------------------------------------------------------+
+    | base_id      | int            | Currently same as id                                                  |
+    +--------------+----------------+-----------------------------------------------------------------------+
+    | name         | str            | Name of the card                                                      |
+    +--------------+----------------+-----------------------------------------------------------------------+
+    | type         | str            | Type of the card, also indicated by the actual class holding the card |
+    +--------------+----------------+-----------------------------------------------------------------------+
+    | text         | str            | Text on the card, includes html                                       |
+    +--------------+----------------+-----------------------------------------------------------------------+
+    | mini_image   | Optional[str]  | Url to mini image                                                     |
+    +--------------+----------------+-----------------------------------------------------------------------+
+    | large_image  | Optional[str]  | Url to large image                                                    |
+    +--------------+----------------+-----------------------------------------------------------------------+
+    | ingame_image | Optional[str]  | Url to ingame image                                                   |
+    +--------------+----------------+-----------------------------------------------------------------------+
     """
     def __init__(self, **kwargs) -> None:
         self.id: int = kwargs['card_id']
@@ -36,9 +36,11 @@ class CardBase:
         self.name: str = kwargs['card_name'][ctx.language]
         self.type: str = kwargs['card_type']
         self.text: str = kwargs['card_text'].get(ctx.language, '')
-        self.mini_image: str = kwargs['mini_image'].get('default')
-        self.large_image: str = kwargs['large_image'].get('default')
-        self.ingame_image: str = kwargs['ingame_image'].get('default')
+        # TODO images maybe should to be moved to NotAbility?
+        self.mini_image: Optional[str] = kwargs['mini_image'].get('default')
+        # Large images can be localized, but a fallback is wise, not only because english is 'default' for some reason
+        self.large_image: Optional[str] = kwargs['large_image'].get(ctx.language, kwargs['large_image'].get('default'))
+        self.ingame_image: Optional[str] = kwargs['ingame_image'].get('default')
         self._references: List[ReferenceType] = kwargs['references']
 
     def __str__(self) -> str:
