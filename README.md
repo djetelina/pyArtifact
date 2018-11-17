@@ -43,3 +43,9 @@ ADCJQUQI30zuwEYg2ABeF1Bu94BmWIBTEkLtAKlAZakAYmHh0JsdWUvUmVkIEV4YW1wbGU_
 * Provide text sanitizers (text atm. has html) - to markdown, strip, etc., use for deck encoding/decoding
 * Add more filtering options
 * Cleanup code structure (possible performance improvements)
+
+
+## Modification with beta key:
+
+* Author beta access: No
+* Giveaways: You wish
