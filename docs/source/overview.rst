@@ -45,7 +45,7 @@ Deck code API
 ~~~~~~~~~~~~~
 
 pyArtifact offers two approaches to deck encoding and decoding. If you want to use the card objects showcased above,
-you can use the :py:class:`pyartifact.Deck` object:
+you can use the :py:class:`~pyartifact.deck.Deck` object:
 
 .. code-block:: python
 
