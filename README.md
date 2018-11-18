@@ -2,7 +2,7 @@
 
 Pythonic wrapper around Valve's Artifact API, with object mapping, filtering and hopefully more
 
-Current phase: **prototype** -> very unstable API
+Current phase: **alpha** -> feedback needed
 
 [![MIT License](https://img.shields.io/github/license/mashape/apistatus.svg?maxAge=2592000)](https://opensource.org/licenses/MIT)
 [![pypi version](https://badge.fury.io/py/pyartifact.svg)](https://badge.fury.io/py/pyartifact)
@@ -43,9 +43,3 @@ ADCJQUQI30zuwEYg2ABeF1Bu94BmWIBTEkLtAKlAZakAYmHh0JsdWUvUmVkIEV4YW1wbGU_
 * Provide text sanitizers (text atm. has html) - to markdown, strip, etc., use for deck encoding/decoding
 * Add more filtering options
 * Cleanup code structure (possible performance improvements)
-
-
-## Modification with beta key:
-
-* Author beta access: No
-* Giveaways: You wish
