@@ -1,6 +1,8 @@
 from collections import defaultdict
 from typing import List, Optional, Union
 
+from fuzzywuzzy import fuzz
+
 from ._context import ctx
 from .filtering import CardFilter
 from .sets_and_cards import CardSet, CardTypesInstanced, NotAbility
@@ -23,6 +25,10 @@ class Cards:
         self.sets: List[CardSet] = [CardSet(set_number) for set_number in self._set_numbers]
         if localize is not None:
             ctx.language = localize.lower()
+        self.__cards_expanded = []
+
+    def __getitem__(self, item):
+        return self.__cards_expanded[item]
 
     def load_all_sets(self) -> None:
         """
@@ -30,9 +36,13 @@ class Cards:
         """
         ctx.cards_by_id = {}
         ctx.cards_by_name = defaultdict(list)
+        self.__cards_expanded = []
         for set_ in self.sets:
             set_.load()
         ctx.loaded_sets = self._set_numbers
+        for set in self.sets:
+            for card in set.data.card_list:
+                self.__cards_expanded.append(card)
 
     @property
     def filter(self) -> 'CardFilter':
@@ -40,7 +50,7 @@ class Cards:
         Creates a new filter instance with all the cards.
         :return:
         """
-        return CardFilter(sets=self.sets)
+        return CardFilter(cards=self.__cards_expanded)
 
     # noinspection PyMethodMayBeStatic
     def get(self, name: str, ignore_shared_name: bool = True) -> Union['CardTypesInstanced', List['CardTypesInstanced']]:
@@ -67,5 +77,33 @@ class Cards:
             return cards_found[0]
         return cards_found
 
-    def find(self, name_approx: str) -> 'CardTypesInstanced':
-        raise NotImplementedError('Card lookup with approx. names is not yet implemented.')
+    def find(self, name_approx: str, threshold: float = 0.95) -> Optional['CardTypesInstanced']:
+        """
+        Finds a card by name, doesn't have to be exact name, thanks to highly sophisticated AI - a.k.a.
+        simple algorithm, that will try and guess what was meant.
+
+        This algorithm can change over time so don't expect the same results across different versions.
+
+        :param name_approx:             Name to look up
+        :param threshold:               How strict to be, higher number -> less likely to
+                                        find a result if the name is off, higher chance the result will be correct
+        """
+        result = None
+
+        if name_approx in ctx.cards_by_name.keys():
+            return self.get(name_approx)
+        name_scores = {}
+        for name in ctx.cards_by_name.keys():
+            score = round(fuzz.partial_ratio(name_approx, name), 2)
+            if score >= threshold:
+                name_scores[name] = score
+
+        max_score = max(name_scores.values())
+        for name, score in name_scores.items():
+            if score == max_score:
+                instantiated = ctx.cards_by_name[name]
+                try:
+                    result = [inst for inst in instantiated if issubclass(inst.__class__, NotAbility)][0]
+                except IndexError:
+                    continue
+                return result

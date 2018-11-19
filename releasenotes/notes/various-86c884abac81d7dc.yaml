@@ -1,0 +1,6 @@
+---
+features:
+  - :py:class:`~api_sync.Cards` can now act as an iterable
+  - :py:meth:`api_sync.Cards.find` was implemented
+other:
+  - Future proofed getting localized text. Language -> default -> unknown

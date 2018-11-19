@@ -1,3 +1,5 @@
+from typing import NamedTuple
+
 import pytest
 
 from pyartifact import Cards
@@ -31,4 +33,25 @@ deck_codes = [
 
 @pytest.fixture(params=deck_codes)
 def deck_code(request):
+    yield request.param
+
+
+class FindFoundPair(NamedTuple):
+    find: str
+    found: str
+
+
+find_names = [
+    FindFoundPair('strom spirit', 'Storm Spirit'),
+    FindFoundPair('anihilation', 'Annihilation'),
+    FindFoundPair('anihliation', 'Annihilation'),
+    FindFoundPair('Centaur warrior', 'Centaur Warrunner'),
+    # FindFoundPair('Gang', 'Gank'),  # This would be nice, atm finds 'Prowler Vanguard', optimizations welcome
+    FindFoundPair('Gank', 'Gank'),
+    FindFoundPair('And one for me', '...And One For Me')
+]
+
+
+@pytest.fixture(params=find_names)
+def find_name(request):
     yield request.param

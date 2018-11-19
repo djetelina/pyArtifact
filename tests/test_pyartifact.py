@@ -7,6 +7,14 @@ def test_filtering(cards):
     assert len(cards.filter.type('Spell').mana_cost(gt=4).color('black').rarity('Rare')) == 1
 
 
+def test_cards_iterable(cards):
+    assert list(cards)
+
+
+def test_find(cards, find_name):
+    assert cards.find(find_name.find).name == find_name.found
+
+
 def test_includes(cards):
     assert len(cards.get('Storm Spirit').includes) == 3
 

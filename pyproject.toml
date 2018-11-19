@@ -12,6 +12,7 @@ readme = "README.md"
 python = "^3.6"
 requests = "^2.20"
 mypy_extensions = "^0.4.1"
+fuzzywuzzy = "^0.17.0"
 
 [tool.poetry.dev-dependencies]
 pytest = "^3.0"

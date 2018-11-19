@@ -49,6 +49,7 @@ setup(
     install_requires=[
         'requests (>=2.20,<3.0)',
         'mypy_extensions (>=0.4.1,<0.5.0)',
+        'fuzzywuzzy (>=0.17.0,<0.18.0)',
     ],  # Optional
     # https://setuptools.readthedocs.io/en/latest/setuptools.html#dependencies-that-aren-t-in-pypi
     dependency_links=[],  # Optional

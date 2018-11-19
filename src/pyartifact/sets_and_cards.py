@@ -33,9 +33,9 @@ class CardBase:
     def __init__(self, **kwargs) -> None:
         self.id: int = kwargs['card_id']
         self.base_id: int = kwargs['base_card_id']
-        self.name: str = kwargs['card_name'][ctx.language]
+        self.name: str = kwargs['card_name'].get(ctx.language, kwargs['card_name'].get('default', 'unknown'))
         self.type: str = kwargs['card_type']
-        self.text: str = kwargs['card_text'].get(ctx.language, '')
+        self.text: str = kwargs['card_text'].get(ctx.language, kwargs['card_text'].get('default', ''))
         # TODO images maybe should to be moved to NotAbility?
         self.mini_image: Optional[str] = kwargs['mini_image'].get('default')
         # Large images can be localized, but a fallback is wise, not only because english is 'default' for some reason
@@ -248,7 +248,7 @@ class SetInfo:
     def __init__(self, set_info: SetInfoType) -> None:
         self.id: int = set_info['set_id']
         self.pack_item_def: int = set_info['pack_item_def']
-        self.name: str = set_info['name'][ctx.language]
+        self.name: str = set_info['name'].get(ctx.language, set_info['name'].get('default', 'unknown'))
 
 
 CardTypesInstanced = Union[Item, Hero, Ability, PassiveAbility, Improvement, Creep, Spell]
@@ -284,7 +284,7 @@ class CardSetData:
                 self.card_list.append(card_instance)
                 # For fast lookups
                 ctx.cards_by_id[card['base_card_id']] = card_instance
-                card_name = card['card_name'][ctx.language].lower()
+                card_name = card_instance.name.lower()
                 ctx.cards_by_name[card_name].append(card_instance)
 
 
