@@ -46,9 +46,20 @@ find_names = [
     FindFoundPair('anihilation', 'Annihilation'),
     FindFoundPair('anihliation', 'Annihilation'),
     FindFoundPair('Centaur warrior', 'Centaur Warrunner'),
-    # FindFoundPair('Gang', 'Gank'),  # This would be nice, atm finds 'Prowler Vanguard', optimizations welcome
+    FindFoundPair('Gang', 'Gank'),
     FindFoundPair('Gank', 'Gank'),
-    FindFoundPair('And one for me', '...And One For Me')
+    FindFoundPair('And one for me', '...And One For Me'),
+    FindFoundPair('Annih', 'Annihilation'),
+    FindFoundPair('Bounty', 'Bounty Hunter'),
+    FindFoundPair('Drow', 'Drow Ranger'),
+    FindFoundPair('Farvhan', 'Farvhan the Dreamer'),
+    FindFoundPair('Favrhan', 'Farvhan the Dreamer'),
+    FindFoundPair('Dominator', 'Helm of the Dominator'),
+    FindFoundPair('Wrathofgold ', 'Wrath of Gold'),
+    FindFoundPair('Gold Wrath', 'Wrath of Gold'),
+    FindFoundPair('Vesture', 'Vesture of the Tyrant'),
+    FindFoundPair('Poisoned Strike', 'Poised to Strike'),
+    FindFoundPair('Lajtnin Strike', 'Lightning Strike')
 ]
 
 

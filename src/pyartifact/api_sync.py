@@ -77,7 +77,7 @@ class Cards:
             return cards_found[0]
         return cards_found
 
-    def find(self, name_approx: str, threshold: float = 0.95) -> Optional['CardTypesInstanced']:
+    def find(self, name_approx: str, threshold: int = 75) -> Optional['CardTypesInstanced']:
         """
         Finds a card by name, doesn't have to be exact name, thanks to highly sophisticated AI - a.k.a.
         simple algorithm, that will try and guess what was meant.
@@ -94,7 +94,7 @@ class Cards:
             return self.get(name_approx)
         name_scores = {}
         for name in ctx.cards_by_name.keys():
-            score = round(fuzz.partial_ratio(name_approx, name), 2)
+            score = fuzz.WRatio(name_approx, name)
             if score >= threshold:
                 name_scores[name] = score
 
