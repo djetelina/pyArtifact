@@ -54,7 +54,7 @@ you can use the :py:class:`~pyartifact.deck.Deck` object:
     # or alternatively
     deck = Deck.loads("ADCJQUQI30zuwEYg2ABeF1Bu94BmWIBTEkLtAKlAZakAYmHh0JsdWUvUmVkIEV4YW1wbGU_")
     # And done!
-    print(len(deck.overview.items))  # It's 9. The deck has 9 items in it
+    print(len(deck.overview.items()))  # It's 9. The deck has 9 items in it
     # You can now edit it
     deck.name = 'Renamed deck'
     # And turn back into a deck code
