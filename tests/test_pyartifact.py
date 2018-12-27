@@ -47,3 +47,10 @@ def test_shared_name(cards):
     assert isinstance(storm, Hero)
     blade = cards.get('Apotheosis Blade')
     assert isinstance(blade, Item)
+
+
+def test_deck_str(deck_code):
+    # Only v2 deck_codes round trip
+    if deck_code['version'] == 2:
+        deck = Deck.from_code(deck_code['string'])
+        assert str(deck) == deck_code['string']
