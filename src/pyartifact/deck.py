@@ -87,7 +87,8 @@ class Deck:
         """Returns the latest version of the deck code."""
         return encode_deck(self.deck_contents)
 
-    __str__ = deck_code
+    def __str__(self) -> str:
+        return self.deck_code
 
     def dumps(self) -> str:
         """
