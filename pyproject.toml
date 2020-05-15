@@ -21,6 +21,6 @@ flake8 = "^3.6"
 sphinx_rtd_theme = "^0.4.2"
 sphinx = "^2.0"
 sphinx-autodoc-typehints = "^1.5"
-reno = {version = "^2.11",extras = ["sphinx"]}
+reno = {version = "^3.1",extras = ["sphinx"]}
 poetry-setup = "^0.3.6"
 lockfile = "^0.12.2"
